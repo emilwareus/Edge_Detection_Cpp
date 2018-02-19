@@ -1,1 +1,0 @@
-Intellegent System Design
