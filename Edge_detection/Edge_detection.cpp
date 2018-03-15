@@ -8,6 +8,8 @@
 //#include <opencv2/core/eigen.hpp>
 #include "Eigen/Dense"
 
+#include "convolution.h"
+
 using namespace cv;
 using namespace std;
 //using Eigen::Matrix;
