@@ -1,28 +1,41 @@
 #include <iostream>
-#include <vector>
+#include "convolution.h"
 
 
-std::vector<std::vector<float> > convolution(std::vector<std::vector<uint8_t> > &image, std::vector<std::vector<uint8_t> > &mask) {
-	int n_rows = image.size(); /* rows */
-	int n_cols = image[0].size(); /* Collumns*/
 
-	int mask_rows = mask.size(); /* Mask Rows */
-	int mask_cols = mask[0].size(); /* Mask Collumns*/
-	
-	std::vector<std::vector<float> > result;
-	for (int row = 1; row < n_rows - mask_rows / 2; row++) {
-		std::vector<float> temp;
-		for (int col = 1; col < n_cols - mask_cols / 2; col++) {
+uint8_t** convolution(uint8_t **image, int n_rows, int n_cols, float **mask, const int mask_rows, const int mask_cols) {
+
+	//Output 2d-array
+	uint8_t **result;
+
+	//Size becomes smaller due to no padding
+	result = new uint8_t *[n_rows - mask_rows + 1];
+
+
+	for (int row = mask_rows / 2; row < n_rows - mask_rows / 2; row++) {
+
+		//Temp array
+		uint8_t *temp;
+		temp = new uint8_t[n_cols - mask_cols + 1];
+		for (int col = mask_cols / 2; col < n_cols - mask_cols / 2; col++) {
+			
+			//Mattrx multiplication 
 			float sum = 0;
 			for (int m_row = 0; m_row < mask_rows; m_row++) {
 				for (int m_col = 0; m_col < mask_cols; m_col++) {
-					sum += mask[m_row][m_col]*image[row][col];
+					sum += mask[m_row][m_col] * image[row - (mask_rows / 2) + m_row][col - (mask_cols / 2) + m_col];
 				}
 			}
-			temp.push_back(sum / (mask_cols*mask_cols));
+
+			//No need to deviede by scale since filter is normalized (filter sum = 1.0)
+			temp[col - mask_cols / 2] = sum;
 		}
-		result.push_back(temp);
+
+		result[row - mask_rows / 2] = temp;
+
 	}
+
 	return result;
 }
+
 
