@@ -2,7 +2,6 @@
 #include "convolution.h"
 
 
-
 uint8_t** convolution(uint8_t **image, int n_rows, int n_cols, float **mask, const int mask_rows, const int mask_cols) {
 
 	//Output 2d-array
@@ -24,6 +23,7 @@ uint8_t** convolution(uint8_t **image, int n_rows, int n_cols, float **mask, con
 			for (int m_row = 0; m_row < mask_rows; m_row++) {
 				for (int m_col = 0; m_col < mask_cols; m_col++) {
 					sum += mask[m_row][m_col] * image[row - (mask_rows / 2) + m_row][col - (mask_cols / 2) + m_col];
+
 				}
 			}
 
@@ -37,5 +37,3 @@ uint8_t** convolution(uint8_t **image, int n_rows, int n_cols, float **mask, con
 
 	return result;
 }
-
-
