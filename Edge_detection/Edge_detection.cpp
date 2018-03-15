@@ -45,6 +45,28 @@ int main() {
 			
 		}
 	}
+
+
+	//Edge detection:
+	//Dimentions of filter mask
+	const int edge_rows = 3;
+	const int edge_cols = 3;
+	float **EdgeFilter;
+	EdgeFilter = new float *[edge_rows];
+
+	//Values of filter 
+	float edge_temp[edge_rows][edge_cols] = { { 2., -1., 2.},
+	{ -1., -4., -1.},
+	{ 2., -1., 2.} };
+
+	//Transfer values and normalize
+	for (int i = 0; i < edge_rows; i++) {
+		EdgeFilter[i] = new float[edge_cols];
+		for (int j = 0; j < edge_cols; j++) {
+			EdgeFilter[i][j] = edge_temp[i][j] / 3;
+
+		}
+	}
 	
 	
 	//unconditional loop
@@ -71,22 +93,32 @@ int main() {
 			for (int j = 0; j < gray.cols; ++j) {
 				image[i][j] =gray.at<uint8_t>(i,j);
 			}
+			
 		}
 
 		
 	
 		//Outpit 2d-array
-		uint8_t **out_image;
+		uint8_t **blur_image;
 
 		//Perform GaussianBlur
-		out_image = convolution(image, gray.rows, gray.cols, GaussianFilter, mask_rows, mask_cols);
-
-
-		//TODO keep adding pipeline
+		blur_image = convolution(image, gray.rows, gray.cols, GaussianFilter, mask_rows, mask_cols);
 
 		//Scale our output image
-		int out_rows = gray.rows - mask_rows + 1;
-		int out_cols = gray.cols - mask_cols + 1;
+		int blur_rows = gray.rows - mask_rows + 1;
+		int blur_cols = gray.cols - mask_cols + 1;
+
+		//Outpit 2d-array
+		uint8_t **out_image;
+
+		//Perform Edge detection
+		out_image = convolution(blur_image, blur_rows, blur_cols, EdgeFilter, edge_rows, edge_cols);
+
+		//Rescale image
+		int out_rows = blur_rows - edge_rows + 1;
+		int out_cols = blur_cols - edge_cols + 1;
+
+
 		
 		
 		//output CV_matrix for display
@@ -105,7 +137,24 @@ int main() {
 		
 		if (waitKey(30) >= 0)
 			break;
+
+		for (int i = 0; i < blur_rows; i++) {
+			delete blur_image[i];
+		}
+		for (int i = 0; i < out_rows; i++) {
+			delete out_image[i];
+		}
+		for (int i = 0; i < gray.rows; i++) {
+			delete image[i];
+		}
+		delete blur_image;
+		delete out_image;
+		delete image;
+		
 	}
+
+	delete GaussianFilter;
+	delete EdgeFilter;
 
 	return 0;
 }
