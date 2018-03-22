@@ -13,6 +13,7 @@ using namespace std;
 Mat src, src_gray;
 Mat dst, detected_edges;
 
+float PI = 3.14;
 
 
 
@@ -42,35 +43,49 @@ int main() {
 		GaussianFilter[i] = new float[mask_cols];
 		for (int j = 0; j < mask_cols; j++) {
 			GaussianFilter[i][j] = temp[i][j]/159;
-			
 		}
 	}
-
+	
 
 	//Edge detection:
 	//Dimentions of filter mask
-	const int edge_rows = 3;
-	const int edge_cols = 3;
-	float **EdgeFilter;
-	EdgeFilter = new float *[edge_rows];
+	const int sobelmask_rows = 3;
+	const int sobelmask_cols = 3;
 
-	//Values of filter 
-	float edge_temp[edge_rows][edge_cols] = { { 2., -1., 2.},
-	{ -1., -4., -1.},
-	{ 2., -1., 2.} };
+	float **sobelMask_y;
+	sobelMask_y = new float *[sobelmask_rows];
 
-	//Transfer values and normalize
-	for (int i = 0; i < edge_rows; i++) {
-		EdgeFilter[i] = new float[edge_cols];
-		for (int j = 0; j < edge_cols; j++) {
-			EdgeFilter[i][j] = edge_temp[i][j] / 3;
+	float **sobelMask_x;
+	sobelMask_x = new float *[sobelmask_rows];
 
+	float tempx[sobelmask_rows][sobelmask_cols] = { { -1, -2, -1 },
+	{ 0, 0, 0 },
+	{ 1, 2, 1 } };
+
+	for (int i = 0; i < sobelmask_rows; i++) {
+		sobelMask_x[i] = new float[sobelmask_cols];
+		for (int j = 0; j < sobelmask_cols; j++) {
+			sobelMask_x[i][j] = tempx[i][j];
+		}
+	}
+
+	float tempy[sobelmask_rows][sobelmask_cols] = { { -1, 0, 1 },
+	{ -2, 0, 2 },
+	{ -1, 0, 1 } };
+
+	for (int i = 0; i < sobelmask_rows; i++) {
+		sobelMask_y[i] = new float[sobelmask_cols];
+		for (int j = 0; j < sobelmask_cols; j++) {
+			sobelMask_y[i][j] = tempy[i][j];
 		}
 	}
 	
-	
+
+
+
 	//unconditional loop
 	while (true) {
+		
 		Mat gray, raw;
 
 		//Grab image from camera
@@ -84,14 +99,15 @@ int main() {
 
 		
 		//2d-array of pixels
-		uint8_t **image;
-		image = new uint8_t *[gray.rows];
+		int **image;
+		image = new int *[gray.rows];
 		
 		//Fill with actual pixel-values for image
 		for (int i = 0; i < gray.rows; ++i) {
-			image[i] = new uint8_t[gray.cols];
+			image[i] = new int[gray.cols];
 			for (int j = 0; j < gray.cols; ++j) {
-				image[i][j] =gray.at<uint8_t>(i,j);
+				image[i][j] =int(gray.at<uint8_t>(i,j));
+				
 			}
 			
 		}
@@ -99,47 +115,215 @@ int main() {
 		
 	
 		//Output 2d-array
-		uint8_t **blur_image;
+		int **blur_image;
 
 		//Perform GaussianBlur
 		blur_image = convolution(image, gray.rows, gray.cols, GaussianFilter, mask_rows, mask_cols);
+
+
 
 		//Scale our output image
 		int blur_rows = gray.rows - mask_rows + 1;
 		int blur_cols = gray.cols - mask_cols + 1;
 
-		//Outpit 2d-array
-		uint8_t **out_image;
+		
+		int **xmask_image;
+		int **ymask_image;
 
 		//Perform Edge detection
-		out_image = convolution(blur_image, blur_rows, blur_cols, EdgeFilter, edge_rows, edge_cols);
+		xmask_image = convolution(blur_image, blur_rows, blur_cols, sobelMask_x, sobelmask_rows, sobelmask_cols);
+		ymask_image = convolution(blur_image, blur_rows, blur_cols, sobelMask_y, sobelmask_rows, sobelmask_cols);
+
+
+
 
 		//Rescale image
-		int out_rows = blur_rows - edge_rows + 1;
-		int out_cols = blur_cols - edge_cols + 1;
+		int out_rows = blur_rows - sobelmask_rows + 1;
+		int out_cols = blur_cols - sobelmask_cols + 1;
 
+		//Output 2d-array
+		int **sobel_image;
+		sobel_image = new int *[out_rows];
+
+		int **edges_image;
+		edges_image = new int *[out_rows];
+
+		int max = 0;
+		int min = 0;
+
+		
+		for (int i = 0; i<out_rows; i++) {
+			sobel_image[i] = new int[out_cols];
+			edges_image[i] = new int[out_cols];
+			for (int j = 0; j<out_cols; j++) {
+				sobel_image[i][j] = int(sqrt(xmask_image[i][j] * xmask_image[i][j] + ymask_image[i][j] * ymask_image[i][j]));
+				
+				
+				if (sobel_image[i][j]>255) {
+					sobel_image[i][j] = 255;
+				}
+				else if (sobel_image[i][j]<0) {
+					sobel_image[i][j] = 0;
+				}
+		
+
+				float temp_dir = atan2(ymask_image[i][j], xmask_image[i][j]) / PI * 180;
+				if ((temp_dir>-22.5 && temp_dir <= 22.5) || (temp_dir>-157.5 && temp_dir <= 157.5)) {
+					temp_dir = 0;
+				}
+				else if ((temp_dir>22.5 && temp_dir <= 67.5) || (temp_dir>112.5 && temp_dir <= -157.5)) {
+					temp_dir = 45;
+				}
+				else if ((temp_dir>67.5 && temp_dir <= 112.5) || (temp_dir <= -67.5 && temp_dir >= -112.5)) {
+					temp_dir = 90;
+				}
+				else if ((temp_dir>112.5 && temp_dir <= 157.5) || (temp_dir>-22.5 && temp_dir <= -67.5)) {
+					temp_dir = 135;
+				}
+				edges_image[i][j] = temp_dir;
+			}
+		}
+
+		//Non maximum suppression
+		int ** thinned_edges_image;
+		thinned_edges_image = new int *[out_rows];
+
+		for (int i = 0; i<out_rows; i++) {
+			thinned_edges_image[i] = new int[out_cols];
+			for (int j = 0; j<out_cols; j++) {
+				
+				thinned_edges_image[i][j] = sobel_image[i][j];
+				
+			}
+		}
+
+		for (int i = 1; i<out_rows-1; i++) {
+			for (int j = 1; j<out_cols-1; j++) {
+
+				if (edges_image[i][j] == 0) {
+					if ((sobel_image[i][j] < sobel_image[i][j + 1]) || (sobel_image[i][j] < sobel_image[i][j - 1])) {
+						thinned_edges_image[i][j] = 0;
+					}
+				}
+				else if (edges_image[i][j] == 90) {
+					if ((sobel_image[i][j] < sobel_image[i + 1][j]) || (sobel_image[i][j] < sobel_image[i - 1][j])) {
+						thinned_edges_image[i][j] = 0;
+					}
+				}
+				else if (edges_image[i][j] == 135) {
+					if ((sobel_image[i][j] < sobel_image[i - 1][j + 1]) || (sobel_image[i][j] < sobel_image[i + 1][j - 1])) {
+						thinned_edges_image[i][j] = 0;
+					}
+				}
+				else if (edges_image[i][j] == 45) {
+					if ((sobel_image[i][j] < sobel_image[i + 1][j + 1]) || (sobel_image[i][j] < sobel_image[i - 1][j - 1])) {
+						thinned_edges_image[i][j] = 0;
+					}
+				}
+
+
+			}
+		}
+
+
+
+		
+		//Thresholding
+		int ** threshold_image;
+		threshold_image = new int *[out_rows];
+
+		for (int i = 0; i<out_rows; i++) {
+			threshold_image[i] = new int[out_cols];
+			for (int j = 0; j<out_cols; j++) {
+				if (thinned_edges_image[i][j] < 70) {
+					threshold_image[i][j] = 0;
+				}
+				else if (thinned_edges_image[i][j] > 150) {
+					
+					threshold_image[i][j] = 255;
+				}
+				else {
+					threshold_image[i][j] = 127;
+				}
+			}
+		}
+		
+
+	
+
+
+		//output CV_matrix for display
+		cv::Mat blur_mat(blur_rows, blur_cols, CV_8U);
+
+		//Add pixels to matrix
+		for (int i = 0; i < blur_rows; ++i) {
+			for (int j = 0; j < blur_cols; ++j) {
+				blur_mat.at<uint8_t>(i, j) = uint8_t(blur_image[i][j]);
+				
+
+			}
+		}
+		
+		//Display matrix
+		imshow("Blur_image", blur_mat);
+
+		//___________________
+	
 		//output CV_matrix for display
 		cv::Mat out_mat(out_rows, out_cols, CV_8UC1);
 
 		//Add pixels to matrix
 		for (int i = 0; i < out_rows; ++i) {
 			for (int j = 0; j < out_cols; ++j) {
-				out_mat.at<uint8_t>(i, j) = out_image[i][j];
-
+				out_mat.at<uint8_t>(i, j) = uint8_t(sobel_image[i][j]);
+				
+				
 			}
 		}
 
 
 		//Display matrix
-		imshow("Edge_image", out_mat);
+		imshow("Sobel_image", out_mat);
 
+		//___________________
 
+	
 
+		//output CV_matrix for display
+		cv::Mat thinned_edges_mat(out_rows, out_cols, CV_8UC1);
+
+		//Add pixels to matrix
+		for (int i = 0; i < out_rows; ++i) {
+			for (int j = 0; j < out_cols; ++j) {
+				thinned_edges_mat.at<uint8_t>(i, j) = uint8_t(thinned_edges_image[i][j]);
+				
+			}
+		}
+
+		cout << "max : " << max << endl;
+		cout << "min : " << min << endl;
 		//Display matrix
-		imshow("non_max_image", max_mat);
-		
+		imshow("Thinned_edges_image", thinned_edges_mat);
 
-		*/
+
+		//________________
+
+
+		//output CV_matrix for display
+		cv::Mat threshold_mat(out_rows, out_cols, CV_8UC1);
+
+		//Add pixels to matrix
+		for (int i = 0; i < out_rows; ++i) {
+			for (int j = 0; j < out_cols; ++j) {
+				threshold_mat.at<uint8_t>(i, j) = uint8_t(threshold_image[i][j]);
+
+			}
+		}
+		//Display matrix
+		imshow("Threshold_image", threshold_mat);
+
+
+		//________________
 		
 		if (waitKey(30) >= 0)
 			break;
@@ -149,20 +333,27 @@ int main() {
 		for (int i = 0; i < blur_rows; i++) {
 			delete blur_image[i];
 		}
-		for (int i = 0; i < out_rows; i++) {
-			delete out_image[i];
-		}
 		for (int i = 0; i < gray.rows; i++) {
 			delete image[i];
 		}
+		
+		for (int i = 0; i < out_rows; i++) {
+			delete sobel_image[i];
+			delete edges_image[i];
+			delete threshold_image[i];
+		}
+		
+		
+		delete sobel_image;
+		delete edges_image;
+		delete threshold_image;
 		delete blur_image;
-		delete out_image;
 		delete image;
 		
 	}
 
 	delete GaussianFilter;
-	delete EdgeFilter;
+	delete sobelMask_x, sobelMask_y;
 
 	return 0;
 }
