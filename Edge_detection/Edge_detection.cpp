@@ -1,7 +1,10 @@
 // Edge_detection.cpp : Defines the entry point for the console application.
 //
 
+#ifdef _WIN32
 #include "stdafx.h"
+#endif
+
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -13,9 +16,25 @@ using namespace std;
 Mat src, src_gray;
 Mat dst, detected_edges;
 
+float** gaussianMask(int std) {	
+	float** result = new float*[3];
+	for (int i = -1; i < 2; i++) {
+		result[i+1] = new float[3];
+		for (int j = -1; j < 2; j++) {
+			result[i+1][j+1] = exp(-(float(i*i) + float(j*j)) / (2.0f * float(std)));
+		}
+	}
+	return result;
+}
 
-
-
+void print3x3Mask(float** mask){
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			cout << mask[i][j] << "   ";
+		}
+		cout << endl;
+	}
+}
 int main() {
 
 	//Open Video stream
@@ -27,8 +46,8 @@ int main() {
 	//Dimentions of filter mask
 	const int mask_rows = 5;
 	const int mask_cols = 5;
-	float **GaussianFilter;
-	GaussianFilter = new float *[mask_rows];
+	float **gaussianFilter;
+	gaussianFilter = new float *[mask_rows];
 
 	//Values of filter 
 	float temp[mask_rows][mask_cols] = {{ 2., 4., 5., 4., 2. },
@@ -39,9 +58,9 @@ int main() {
 
 	//Transfer values and normalize
 	for (int i = 0; i < mask_rows; i++) {
-		GaussianFilter[i] = new float[mask_cols];
+		gaussianFilter[i] = new float[mask_cols];
 		for (int j = 0; j < mask_cols; j++) {
-			GaussianFilter[i][j] = temp[i][j]/159;
+			gaussianFilter[i][j] = temp[i][j]/159;
 			
 		}
 	}
@@ -51,8 +70,8 @@ int main() {
 	//Dimentions of filter mask
 	const int edge_rows = 3;
 	const int edge_cols = 3;
-	float **EdgeFilter;
-	EdgeFilter = new float *[edge_rows];
+	float **edgeFilter;
+	edgeFilter = new float *[edge_rows];
 
 	//Values of filter 
 	float edge_temp[edge_rows][edge_cols] = { { 2., -1., 2.},
@@ -61,9 +80,9 @@ int main() {
 
 	//Transfer values and normalize
 	for (int i = 0; i < edge_rows; i++) {
-		EdgeFilter[i] = new float[edge_cols];
+		edgeFilter[i] = new float[edge_cols];
 		for (int j = 0; j < edge_cols; j++) {
-			EdgeFilter[i][j] = edge_temp[i][j] / 3;
+			edgeFilter[i][j] = edge_temp[i][j] / 3;
 
 		}
 	}
@@ -102,7 +121,7 @@ int main() {
 		uint8_t **blur_image;
 
 		//Perform GaussianBlur
-		blur_image = convolution(image, gray.rows, gray.cols, GaussianFilter, mask_rows, mask_cols);
+		blur_image = convolution(image, gray.rows, gray.cols, gaussianFilter, mask_rows, mask_cols);
 
 		//Scale our output image
 		int blur_rows = gray.rows - mask_rows + 1;
@@ -112,7 +131,7 @@ int main() {
 		uint8_t **out_image;
 
 		//Perform Edge detection
-		out_image = convolution(blur_image, blur_rows, blur_cols, EdgeFilter, edge_rows, edge_cols);
+		out_image = convolution(blur_image, blur_rows, blur_cols, edgeFilter, edge_rows, edge_cols);
 
 		//Rescale image
 		int out_rows = blur_rows - edge_rows + 1;
@@ -153,8 +172,7 @@ int main() {
 		
 	}
 
-	delete GaussianFilter;
-	delete EdgeFilter;
-
-	return 0;
+	delete gaussianFilter;
+	delete edgeFilter;
 }
+
