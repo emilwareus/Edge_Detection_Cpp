@@ -19,12 +19,12 @@ Mat dst, detected_edges;
 
 float PI = 3.14;
 
-float** gaussianMask(int std) {	
-	float** result = new float*[3];
+int** gaussianMask(int std) {	
+	int** result = new int*[3];
 	for (int i = -1; i < 2; i++) {
-		result[i+1] = new float[3];
+		result[i+1] = new int[3];
 		for (int j = -1; j < 2; j++) {
-			result[i+1][j+1] = exp(-(float(i*i) + float(j*j)) / (2.0f * float(std)));
+			result[i+1][j+1] = int(exp(-(float(i*i) + float(j*j)) / (2.0f * float(std))));
 		}
 	}
 	return result;
@@ -50,22 +50,23 @@ int main() {
 	//Dimentions of filter mask
 	const int mask_rows = 5;
 	const int mask_cols = 5;
-	float **gaussianFilter;
-	gaussianFilter = new float *[mask_rows];
+	int **gaussianFilter;
+	gaussianFilter = new int *[mask_rows];
 
 	//Values of filter 
-	float temp[mask_rows][mask_cols] = {{ 2., 4., 5., 4., 2. },
+	int temp[mask_rows][mask_cols] = {{ 2., 4., 5., 4., 2. },
 	{ 4., 9., 12., 9., 4. },
 	{ 5., 12., 15., 12., 5. },
 	{ 4., 9., 12., 9., 4. },
 	{ 2., 4., 5., 4., 2. } };
 
+	int gaussian_normfactor = 0;
 	//Transfer values and normalize
 	for (int i = 0; i < mask_rows; i++) {
-		gaussianFilter[i] = new float[mask_cols];
+		gaussianFilter[i] = new int[mask_cols];
 		for (int j = 0; j < mask_cols; j++) {
-
-			gaussianFilter[i][j] = temp[i][j]/159;
+			gaussianFilter[i][j] = int(temp[i][j]);
+			gaussian_normfactor = gaussian_normfactor + gaussianFilter[i][j];
 		}
 	}
 	
@@ -76,32 +77,32 @@ int main() {
 	const int sobelmask_rows = 3;
 	const int sobelmask_cols = 3;
 
-	float **sobelMask_y;
-	sobelMask_y = new float *[sobelmask_rows];
+	int **sobelMask_y;
+	sobelMask_y = new int *[sobelmask_rows];
 
 
-	float **sobelMask_x;
-	sobelMask_x = new float *[sobelmask_rows];
+	int **sobelMask_x;
+	sobelMask_x = new int *[sobelmask_rows];
 
-	float tempx[sobelmask_rows][sobelmask_cols] = { { -1, -2, -1 },
+	int tempx[sobelmask_rows][sobelmask_cols] = { { -1, -2, -1 },
 	{ 0, 0, 0 },
 	{ 1, 2, 1 } };
 
 	//Transfer values and normalize
 
 	for (int i = 0; i < sobelmask_rows; i++) {
-		sobelMask_x[i] = new float[sobelmask_cols];
+		sobelMask_x[i] = new int[sobelmask_cols];
 		for (int j = 0; j < sobelmask_cols; j++) {
 			sobelMask_x[i][j] = tempx[i][j];
 		}
 	}
 
-	float tempy[sobelmask_rows][sobelmask_cols] = { { -1, 0, 1 },
+	int tempy[sobelmask_rows][sobelmask_cols] = { { -1, 0, 1 },
 	{ -2, 0, 2 },
 	{ -1, 0, 1 } };
 
 	for (int i = 0; i < sobelmask_rows; i++) {
-		sobelMask_y[i] = new float[sobelmask_cols];
+		sobelMask_y[i] = new int[sobelmask_cols];
 		for (int j = 0; j < sobelmask_cols; j++) {
 			sobelMask_y[i][j] = tempy[i][j];
 		}
@@ -145,7 +146,7 @@ int main() {
 		int **blur_image;
 
 		//Perform GaussianBlur
-		blur_image = convolution(image, gray.rows, gray.cols, gaussianFilter, mask_rows, mask_cols);
+		blur_image = convolution_norm(image, gray.rows, gray.cols, gaussianFilter, mask_rows, mask_cols, gaussian_normfactor);
 
 
 
