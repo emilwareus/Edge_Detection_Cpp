@@ -177,9 +177,6 @@ int main() {
 		int **edges_image;
 		edges_image = new int *[out_rows];
 
-		int max = 0;
-		int min = 0;
-
 		
 		for (int i = 0; i<out_rows; i++) {
 			sobel_image[i] = new int[out_cols];
@@ -264,10 +261,10 @@ int main() {
 		for (int i = 0; i<out_rows; i++) {
 			threshold_image[i] = new int[out_cols];
 			for (int j = 0; j<out_cols; j++) {
-				if (thinned_edges_image[i][j] < 70) {
+				if (thinned_edges_image[i][j] < 60) {
 					threshold_image[i][j] = 0;
 				}
-				else if (thinned_edges_image[i][j] > 150) {
+				else if (thinned_edges_image[i][j] > 100) {
 					
 					threshold_image[i][j] = 255;
 				}
@@ -277,6 +274,25 @@ int main() {
 			}
 		}
 		
+
+		//Hysteresis
+		int ** hysteresis_image;
+		hysteresis_image = new int *[out_rows];
+
+		for (int i = 1; i<out_rows-1; i++) {
+			hysteresis_image[i] = new int[out_cols];
+			for (int j = 1; j<out_cols-1; j++) {
+				hysteresis_image[i][j] = threshold_image[i][j];
+				if (threshold_image[i][j] == 127) {
+					if (threshold_image[i - 1][j - 1] == 255 || threshold_image[i - 1][j] == 255 || threshold_image[i - 1][j + 1] == 255 || threshold_image[i][j - 1] == 255 || threshold_image[i][j + 1] == 255 || threshold_image[i + 1][j - 1] == 255 || threshold_image[i + 1][j] == 255 || threshold_image[i + 1][j + 1] == 255) {
+						hysteresis_image[i][j] = 255;
+					}
+					else {
+						hysteresis_image[i][j] = 0;
+					}
+				}
+			}
+		}
 
 	
 
@@ -329,8 +345,6 @@ int main() {
 			}
 		}
 
-		cout << "max : " << max << endl;
-		cout << "min : " << min << endl;
 		//Display matrix
 		imshow("Thinned_edges_image", thinned_edges_mat);
 
@@ -354,6 +368,23 @@ int main() {
 
 		//________________
 		
+		//output CV_matrix for display
+		cv::Mat hysteresis_mat(out_rows, out_cols, CV_8UC1);
+
+		//Add pixels to matrix
+		for (int i = 1; i < out_rows-1; ++i) {
+			for (int j = 1; j < out_cols-1; ++j) {
+				hysteresis_mat.at<uint8_t>(i, j) = uint8_t(hysteresis_image[i][j]);
+
+			}
+		}
+		//Display matrix
+		imshow("Hysteresis_image", hysteresis_mat);
+
+
+		//________________
+
+
 		if (waitKey(30) >= 0)
 			break;
 
@@ -370,9 +401,15 @@ int main() {
 			delete sobel_image[i];
 			delete edges_image[i];
 			delete threshold_image[i];
+			delete thinned_edges_image[i];
+		}
+
+		for (int i = 1; i < out_rows-1; i++) {
+			delete hysteresis_image[i];
 		}
 		
-		
+		delete thinned_edges_image;
+		delete hysteresis_image;
 		delete sobel_image;
 		delete edges_image;
 		delete threshold_image;

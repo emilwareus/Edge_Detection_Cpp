@@ -54,9 +54,6 @@ int** convolution_norm(int **image, int n_rows, int n_cols, int **mask, const in
 
 	//Size becomes smaller due to no padding
 	result = new int *[n_rows - mask_rows + 1];
-
-	
-
 	for (int row = mask_rows / 2; row < n_rows - mask_rows / 2; row++) {
 
 		//Temp array
