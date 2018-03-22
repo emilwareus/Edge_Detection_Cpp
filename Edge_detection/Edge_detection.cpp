@@ -1,7 +1,10 @@
 // Edge_detection.cpp : Defines the entry point for the console application.
 //
 
+#ifdef _WIN32
 #include "stdafx.h"
+#endif
+
 #include <iostream>
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
@@ -13,10 +16,29 @@ using namespace std;
 Mat src, src_gray;
 Mat dst, detected_edges;
 
+
 float PI = 3.14;
 
+float** gaussianMask(int std) {	
+	float** result = new float*[3];
+	for (int i = -1; i < 2; i++) {
+		result[i+1] = new float[3];
+		for (int j = -1; j < 2; j++) {
+			result[i+1][j+1] = exp(-(float(i*i) + float(j*j)) / (2.0f * float(std)));
+		}
+	}
+	return result;
+}
 
 
+void print3x3Mask(float** mask){
+	for (int i = 0; i < 3; i++) {
+		for (int j = 0; j < 3; j++) {
+			cout << mask[i][j] << "   ";
+		}
+		cout << endl;
+	}
+}
 int main() {
 
 	//Open Video stream
@@ -28,8 +50,8 @@ int main() {
 	//Dimentions of filter mask
 	const int mask_rows = 5;
 	const int mask_cols = 5;
-	float **GaussianFilter;
-	GaussianFilter = new float *[mask_rows];
+	float **gaussianFilter;
+	gaussianFilter = new float *[mask_rows];
 
 	//Values of filter 
 	float temp[mask_rows][mask_cols] = {{ 2., 4., 5., 4., 2. },
@@ -40,20 +62,23 @@ int main() {
 
 	//Transfer values and normalize
 	for (int i = 0; i < mask_rows; i++) {
-		GaussianFilter[i] = new float[mask_cols];
+		gaussianFilter[i] = new float[mask_cols];
 		for (int j = 0; j < mask_cols; j++) {
-			GaussianFilter[i][j] = temp[i][j]/159;
+
+			gaussianFilter[i][j] = temp[i][j]/159;
 		}
 	}
 	
 
 	//Edge detection:
 	//Dimentions of filter mask
+
 	const int sobelmask_rows = 3;
 	const int sobelmask_cols = 3;
 
 	float **sobelMask_y;
 	sobelMask_y = new float *[sobelmask_rows];
+
 
 	float **sobelMask_x;
 	sobelMask_x = new float *[sobelmask_rows];
@@ -61,6 +86,8 @@ int main() {
 	float tempx[sobelmask_rows][sobelmask_cols] = { { -1, -2, -1 },
 	{ 0, 0, 0 },
 	{ 1, 2, 1 } };
+
+	//Transfer values and normalize
 
 	for (int i = 0; i < sobelmask_rows; i++) {
 		sobelMask_x[i] = new float[sobelmask_cols];
@@ -118,7 +145,7 @@ int main() {
 		int **blur_image;
 
 		//Perform GaussianBlur
-		blur_image = convolution(image, gray.rows, gray.cols, GaussianFilter, mask_rows, mask_cols);
+		blur_image = convolution(image, gray.rows, gray.cols, gaussianFilter, mask_rows, mask_cols);
 
 
 
@@ -131,6 +158,7 @@ int main() {
 		int **ymask_image;
 
 		//Perform Edge detection
+
 		xmask_image = convolution(blur_image, blur_rows, blur_cols, sobelMask_x, sobelmask_rows, sobelmask_cols);
 		ymask_image = convolution(blur_image, blur_rows, blur_cols, sobelMask_y, sobelmask_rows, sobelmask_cols);
 
@@ -352,8 +380,11 @@ int main() {
 		
 	}
 
-	delete GaussianFilter;
+
+	delete gaussianFilter;
 	delete sobelMask_x, sobelMask_y;
 
 	return 0;
+
 }
+
