@@ -98,7 +98,7 @@ int main() {
 
 		
 	
-		//Outpit 2d-array
+		//Output 2d-array
 		uint8_t **blur_image;
 
 		//Perform GaussianBlur
@@ -118,25 +118,33 @@ int main() {
 		int out_rows = blur_rows - edge_rows + 1;
 		int out_cols = blur_cols - edge_cols + 1;
 
-
-		
-		
 		//output CV_matrix for display
-		cv::Mat out_mat(out_rows , out_cols, CV_8UC1);
+		cv::Mat out_mat(out_rows, out_cols, CV_8UC1);
 
 		//Add pixels to matrix
 		for (int i = 0; i < out_rows; ++i) {
 			for (int j = 0; j < out_cols; ++j) {
 				out_mat.at<uint8_t>(i, j) = out_image[i][j];
-				
+
 			}
 		}
 
+
 		//Display matrix
-		imshow("cam", out_mat);
+		imshow("Edge_image", out_mat);
+
+
+
+		//Display matrix
+		imshow("non_max_image", max_mat);
+		
+
+		*/
 		
 		if (waitKey(30) >= 0)
 			break;
+
+
 
 		for (int i = 0; i < blur_rows; i++) {
 			delete blur_image[i];
