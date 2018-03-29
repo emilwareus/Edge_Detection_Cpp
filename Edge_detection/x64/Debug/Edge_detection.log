@@ -1,22 +1,22 @@
 ﻿  Edge_detection.cpp
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(27): warning C4305: 'initializing': truncation from 'double' to 'float'
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(60): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(28): warning C4305: 'initializing': truncation from 'double' to 'float'
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(61): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(63): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(65): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(64): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(66): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(67): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
-  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(68): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(69): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
 c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(70): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(81): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(72): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
   c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(167): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(180): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(433): warning C4838: conversion from 'double' to 'int' requires a narrowing conversion
-c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(433): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(83): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  c:\program files (x86)\windows kits\10\include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(179): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(192): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(453): warning C4838: conversion from 'double' to 'int' requires a narrowing conversion
+c:\users\emil wåreus\onedrive\skola\intellegent system design\edge_detection\edge_detection.cpp(453): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
   Edge_detection.vcxproj -> C:\Users\Emil Wåreus\OneDrive\Skola\Intellegent System Design\Edge_detection\x64\Debug\Edge_detection.exe
   Edge_detection.vcxproj -> C:\Users\Emil Wåreus\OneDrive\Skola\Intellegent System Design\Edge_detection\x64\Debug\Edge_detection.pdb (Partial PDB)

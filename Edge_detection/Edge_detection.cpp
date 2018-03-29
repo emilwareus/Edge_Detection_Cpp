@@ -21,6 +21,7 @@ using namespace std;
 int cols;
 int rows;
 unsigned int bitNum;
+const char* name_of_image;
 
 
 
@@ -50,7 +51,7 @@ void save_image(string outputFileName_str, int **image, int n_rows, int n_cols) 
 	}
 	ofstream myFile(outputFileName, ios::out | ios::binary);
 	myFile.write(buffer, size);
-	delete buffer;
+	
 }
 
 
@@ -58,6 +59,7 @@ int ** read_image(const char* image_name) {
 	char buff[5];
 	FILE * imageFile;
 	imageFile = fopen(image_name, "rb");
+	name_of_image = image_name;
 
 	/*get Header  -> rowNum, colNum and BitperPixel*/
 	fscanf(imageFile, "%c", &buff[0]);
@@ -111,7 +113,15 @@ void print3x3Mask(float** mask){
 void edge_detection(int **image, int image_rows, int image_cols, int **gaussianFilter, const int mask_rows, const int mask_cols, int **sobelMask_x, int **sobelMask_y, int sobelmask_rows, int sobelmask_cols, int gaussian_normfactor, bool save) {
 	
 
-
+	
+	int min = 0;
+	for (int i = 0; i < image_rows; i++) {
+		for (int j = 0; j < image_cols; j++) {
+			if (0 > image[i][j]) {
+				image[i][j] = image[i][j] + 256;
+			}
+		}
+	}
 
 	//Output 2d-array
 	int **blur_image;
@@ -125,6 +135,8 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 	int blur_rows = image_rows - mask_rows + 1;
 	int blur_cols = image_cols - mask_cols + 1;
 
+
+	
 
 	int **xmask_image;
 	int **ymask_image;
@@ -249,9 +261,9 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 	hysteresis_image = new int *[out_rows];
 
 
-	for (int i = 1; i<out_rows; i++) {
+	for (int i = 0; i<out_rows; i++) {
 		hysteresis_image[i] = new int[out_cols];
-		for (int j = 1; j<out_cols; j++) {
+		for (int j = 0; j<out_cols; j++) {
 			hysteresis_image[i][j] = threshold_image[i][j];
 		}
 	}
@@ -277,6 +289,8 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 		}
 	}
 
+
+	
 
 
 	/*
@@ -373,13 +387,13 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 	if(save == true){
 
 		save_image("modified_images/original_image.raw", image, image_rows, image_cols);
+		save_image("modified_images/gaussian_image.raw", blur_image, blur_rows, blur_cols);
 		save_image("modified_images/sobel_image.raw", sobel_image, out_rows, out_cols);
 		save_image("modified_images/thinned_edges_image.raw", thinned_edges_image, out_rows, out_cols);
 		save_image("modified_images/threshold_image.raw", threshold_image, out_rows, out_cols);
 		save_image("modified_images/hysteresis_image.raw", hysteresis_image, out_rows, out_cols);
 
 	}
-
 
 	for (int i = 0; i < blur_rows; i++) {
 		delete blur_image[i];
@@ -406,10 +420,7 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 	delete threshold_image;
 	delete blur_image;
 	delete image;
-
-
-
-
+	
 
 }
 
@@ -424,13 +435,9 @@ int main() {
 	}
 	*/
 
-	/* To open .raw images
-	int **image;
-	image = read_image("images/leaf.raw");
+	
 
-	save_image("modified_images/original_image.raw", image, rows, cols);
-
-	*/
+	
 
 	//Dimentions of filter mask
 	const int mask_rows = 5;
@@ -494,12 +501,50 @@ int main() {
 	}
 	
 
+	bool run = true;
 	//Edgedetection 
+	while (run) {
+		int **image;
 
+		int which_image = 0;
+		cout << "Please input a number between 0 and 4 to chose image, or 5 for exit" << endl;
+		cin >> which_image;
 
+		switch (which_image) {
+		case 0:
+			image = read_image("images/leaf.raw");
+			break;
 
+		case 1:
+			image = read_image("images/cana.raw");
+			break;
 
+		case 2:
+			image = read_image("images/fruit.raw");
+			break;
 
+		case 3:
+			image = read_image("images/img335.raw");
+			break;
+
+		case 4:
+			image = read_image("images/lamp.raw");
+			break;
+
+		case 5:
+			run = false;
+			break;
+		default:
+			cout << "Invalid input, please enter 0 - 4, or 5 for break" << endl;
+
+		}
+
+		if(run==true){
+			edge_detection(image, rows, cols, gaussianFilter, mask_rows, mask_cols, sobelMask_x, sobelMask_y, sobelmask_rows, sobelmask_cols, gaussian_normfactor, true);
+		}
+	}	
+	
+	
 	//unconditional loop
 	/*
 	while (true) {

@@ -1,0 +1,24 @@
+﻿  Edge_detection.cpp
+Edge_detection.cpp(28): warning C4305: 'initializing': truncation from 'double' to 'float'
+Edge_detection.cpp(61): warning C4996: 'fopen': This function or variable may be unsafe. Consider using fopen_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(207): note: see declaration of 'fopen'
+Edge_detection.cpp(65): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
+Edge_detection.cpp(66): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
+Edge_detection.cpp(69): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
+Edge_detection.cpp(70): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
+Edge_detection.cpp(72): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
+Edge_detection.cpp(83): warning C4996: 'fscanf': This function or variable may be unsafe. Consider using fscanf_s instead. To disable deprecation, use _CRT_SECURE_NO_WARNINGS. See online help for details.
+  C:\Program Files (x86)\Windows Kits\10\Include\10.0.15063.0\ucrt\stdio.h(1195): note: see declaration of 'fscanf'
+Edge_detection.cpp(179): warning C4244: 'initializing': conversion from 'double' to 'float', possible loss of data
+Edge_detection.cpp(192): warning C4244: '=': conversion from 'float' to 'int', possible loss of data
+Edge_detection.cpp(453): warning C4838: conversion from 'double' to 'int' requires a narrowing conversion
+Edge_detection.cpp(453): warning C4244: 'initializing': conversion from 'double' to 'int', possible loss of data
+  Generating code
+  All 160 functions were compiled because no usable IPDB/IOBJ from previous compilation was found.
+  Finished generating code
+  Edge_detection.vcxproj -> C:\Users\Emil Wåreus\OneDrive\Skola\Intellegent System Design\Edge_detection\x64\Release\Edge_detection.exe
