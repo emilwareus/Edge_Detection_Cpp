@@ -9,12 +9,18 @@
 #include <opencv2/highgui/highgui.hpp>
 #include <opencv2/imgproc/imgproc.hpp>
 #include "convolution.h"
+#include <stdio.h>
+#include <fstream>
+#include <bitset>
 
 using namespace cv;
 using namespace std;
 
 Mat src, src_gray;
 Mat dst, detected_edges;
+int cols;
+int rows;
+unsigned int bitNum;
 
 
 float PI = 3.14;
@@ -30,6 +36,65 @@ int** gaussianMask(int std) {
 	return result;
 }
 
+void save_image(string outputFileName_str, int **image, int n_rows, int n_cols) {
+	const char* outputFileName = outputFileName_str.c_str();
+
+	//Output image in a new file
+	int size = n_rows * n_cols;
+	char* buffer = new char[size -1];
+	for (int i = 0; i<n_rows; i++) {
+		for (int j = 0; j<n_cols; j++) {
+			buffer[i*n_cols + j] = (int)image[i][j];
+		}
+	}
+	ofstream myFile(outputFileName, ios::out | ios::binary);
+	myFile.write(buffer, size);
+	delete buffer;
+}
+
+
+int ** read_image(const char* image_name) {
+	char buff[5];
+	FILE * imageFile;
+	imageFile = fopen(image_name, "rb");
+
+	/*get Header  -> rowNum, colNum and BitperPixel*/
+	fscanf(imageFile, "%c", &buff[0]);
+	fscanf(imageFile, "%c", &buff[1]);
+	cols = ((unsigned int)buff[1] << 8) + (unsigned int)(buff[0] & 0xff);
+
+	fscanf(imageFile, "%c", &buff[2]);
+	fscanf(imageFile, "%c", &buff[3]);
+	rows = ((unsigned int)buff[3] << 8) + (unsigned int)(buff[2] & 0xff);
+	fscanf(imageFile, "%c", &buff[4]);
+	bitNum = (unsigned int)(buff[4] & 0x08);
+	cout << "Header: -> rows: " << rows << " cols: " << cols << " bitNum: " << bitNum << endl;
+
+	int **image_temp;
+	image_temp = new int *[rows];
+	
+	for (int i = 0; i<rows; i++) {
+		image_temp[i] = new int[cols];
+		for (int j = 0; j<cols; j++) {
+			char pixbuff;
+			fscanf(imageFile, "%c", &pixbuff);
+			int val_temp = (int)pixbuff;
+			image_temp[i][j] = val_temp;
+		}
+	}
+
+	int **image;
+	image = new int *[rows];
+
+	//Fill with actual pixel-values for image
+	for (int i = 0; i < rows; ++i) {
+		image[i] = new int[cols];
+		for (int j = 0; j < cols; ++j) {
+			image[i][j] = image_temp[i][j];
+		}
+	}
+	return image;
+}
 
 void print3x3Mask(float** mask){
 	for (int i = 0; i < 3; i++) {
@@ -46,6 +111,14 @@ int main() {
 	if (!stream1.isOpened()) { //check if video device has been initialisedc
 		cout << "cannot open camera";
 	}
+
+	/* To open .raw images
+	int **image;
+	image = read_image("images/leaf.raw");
+
+	save_image("modified_images/original_image.raw", image, rows, cols);
+
+	*/
 
 	//Dimentions of filter mask
 	const int mask_rows = 5;
@@ -177,7 +250,7 @@ int main() {
 		int **edges_image;
 		edges_image = new int *[out_rows];
 
-		
+		//edge magnitude and direction
 		for (int i = 0; i<out_rows; i++) {
 			sobel_image[i] = new int[out_cols];
 			edges_image[i] = new int[out_cols];
@@ -216,8 +289,7 @@ int main() {
 
 		for (int i = 0; i<out_rows; i++) {
 			thinned_edges_image[i] = new int[out_cols];
-			for (int j = 0; j<out_cols; j++) {
-				
+			for (int j = 0; j<out_cols; j++) {	
 				thinned_edges_image[i][j] = sobel_image[i][j];
 				
 			}
@@ -225,7 +297,6 @@ int main() {
 
 		for (int i = 1; i<out_rows-1; i++) {
 			for (int j = 1; j<out_cols-1; j++) {
-
 				if (edges_image[i][j] == 0) {
 					if ((sobel_image[i][j] < sobel_image[i][j + 1]) || (sobel_image[i][j] < sobel_image[i][j - 1])) {
 						thinned_edges_image[i][j] = 0;
@@ -279,22 +350,35 @@ int main() {
 		int ** hysteresis_image;
 		hysteresis_image = new int *[out_rows];
 
-		for (int i = 1; i<out_rows-1; i++) {
+
+		for (int i = 1; i<out_rows; i++) {
 			hysteresis_image[i] = new int[out_cols];
-			for (int j = 1; j<out_cols-1; j++) {
+			for (int j = 1; j<out_cols; j++) {
 				hysteresis_image[i][j] = threshold_image[i][j];
-				if (threshold_image[i][j] == 127) {
-					if (threshold_image[i - 1][j - 1] == 255 || threshold_image[i - 1][j] == 255 || threshold_image[i - 1][j + 1] == 255 || threshold_image[i][j - 1] == 255 || threshold_image[i][j + 1] == 255 || threshold_image[i + 1][j - 1] == 255 || threshold_image[i + 1][j] == 255 || threshold_image[i + 1][j + 1] == 255) {
-						hysteresis_image[i][j] = 255;
-					}
-					else {
-						hysteresis_image[i][j] = 0;
+			}
+		}
+		int image_has_changed = 1;
+		while (image_has_changed == 1) {
+			image_has_changed = 0;
+			for (int i = 1; i<out_rows-1; i++) {
+				for (int j = 1; j<out_cols-1; j++) {
+					if (hysteresis_image[i][j] == 127) {
+						if (hysteresis_image[i - 1][j - 1] == 255 || hysteresis_image[i - 1][j] == 255 || hysteresis_image[i - 1][j + 1] == 255 || hysteresis_image[i][j - 1] == 255 || hysteresis_image[i][j + 1] == 255 || hysteresis_image[i + 1][j - 1] == 255 || hysteresis_image[i + 1][j] == 255 || hysteresis_image[i + 1][j + 1] == 255) {
+							hysteresis_image[i][j] = 255;
+							image_has_changed = 1;
+						}
 					}
 				}
 			}
 		}
+		for (int i = 1; i<out_rows; i++) {
+			for (int j = 1; j<out_cols; j++) {
+				if (hysteresis_image[i][j] == 127) {
+					hysteresis_image[i][j] = 0;
+				}
+			}
+		}
 
-	
 
 
 		//output CV_matrix for display
