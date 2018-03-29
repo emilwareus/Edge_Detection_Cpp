@@ -6,18 +6,18 @@
 #endif
 
 #include <iostream>
-#include <opencv2/highgui/highgui.hpp>
-#include <opencv2/imgproc/imgproc.hpp>
+//#include <opencv2/highgui/highgui.hpp>
+//#include <opencv2/imgproc/imgproc.hpp>
 #include "convolution.h"
 #include <stdio.h>
 #include <fstream>
 #include <bitset>
 
-using namespace cv;
+//using namespace cv;
 using namespace std;
 
-Mat src, src_gray;
-Mat dst, detected_edges;
+//Mat src, src_gray;
+//Mat dst, detected_edges;
 int cols;
 int rows;
 unsigned int bitNum;
@@ -279,6 +279,7 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 
 
 
+	/*
 	//output CV_matrix for display
 	cv::Mat blur_mat(blur_rows, blur_cols, CV_8U);
 
@@ -366,7 +367,7 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 
 	//________________
 
-
+	*/
 	
 	//Saves the images
 	if(save == true){
@@ -416,10 +417,12 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 int main() {
 
 	//Open Video stream
+	/*
 	VideoCapture stream1(1);   //0 is the id of video device.0 if you have only one camera.
 	if (!stream1.isOpened()) { //check if video device has been initialisedc
 		cout << "cannot open camera";
 	}
+	*/
 
 	/* To open .raw images
 	int **image;
@@ -490,6 +493,10 @@ int main() {
 		}
 	}
 	
+
+	//Edgedetection 
+
+
 
 
 
