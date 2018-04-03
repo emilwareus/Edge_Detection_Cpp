@@ -6,14 +6,14 @@
 #endif
 
 #include <iostream>
-//#include <opencv2/highgui/highgui.hpp>
-//#include <opencv2/imgproc/imgproc.hpp>
+#include <opencv2/highgui/highgui.hpp>
+#include <opencv2/imgproc/imgproc.hpp>
 #include "convolution.h"
 #include <stdio.h>
 #include <fstream>
 #include <bitset>
 
-//using namespace cv;
+using namespace cv;
 using namespace std;
 
 //Mat src, src_gray;
@@ -293,7 +293,7 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 	
 
 
-	/*
+	
 	//output CV_matrix for display
 	cv::Mat blur_mat(blur_rows, blur_cols, CV_8U);
 
@@ -380,8 +380,9 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 
 
 	//________________
+	
 
-	*/
+	
 	
 	//Saves the images
 	if(save == true){
@@ -540,7 +541,11 @@ int main() {
 		}
 
 		if(run==true){
+			
 			edge_detection(image, rows, cols, gaussianFilter, mask_rows, mask_cols, sobelMask_x, sobelMask_y, sobelmask_rows, sobelmask_cols, gaussian_normfactor, true);
+			if (waitKey(30) >= 0)
+				break;
+		
 		}
 	}	
 	
