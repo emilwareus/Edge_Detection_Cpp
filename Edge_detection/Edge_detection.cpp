@@ -242,10 +242,10 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 	for (int i = 0; i<out_rows; i++) {
 		threshold_image[i] = new int[out_cols];
 		for (int j = 0; j<out_cols; j++) {
-			if (thinned_edges_image[i][j] < 60) {
+			if (thinned_edges_image[i][j] < 100) {
 				threshold_image[i][j] = 0;
 			}
-			else if (thinned_edges_image[i][j] > 100) {
+			else if (thinned_edges_image[i][j] > 200) {
 
 				threshold_image[i][j] = 255;
 			}
@@ -436,33 +436,45 @@ int main() {
 	}
 	*/
 
-	
 
-	
+	// The user can choose sigma
+	bool run2 = false;
+	//Edgedetection 
+	float sigma;
+	while (!run2) {
+		cout << "Please choose the value of sigma (float between 0 and 3)" << endl;
+		cin >> sigma;
+		if (sigma > 0 && sigma <= 3) {
+			run2 = true;
+		}
+		else {
+			cout << "Invalid input, try again !" << endl;
+		}
+	}
 
-	//Dimentions of filter mask
-	const int mask_rows = 5;
-	const int mask_cols = 5;
-	int **gaussianFilter;
-	gaussianFilter = new int *[mask_rows];
+	int width = 1;
+	while ((width / (5 * sigma)) < 1) {
+		width = width + 2;
+	}
+	cout << "The size of the gaussian mask is " << width << endl;
+	const int mask_rows = width;
+	const int mask_cols = width;
 
-	//Values of filter 
-	int temp[mask_rows][mask_cols] = {{ 2., 4., 5., 4., 2. },
-	{ 4., 9., 12., 9., 4. },
-	{ 5., 12., 15., 12., 5. },
-	{ 4., 9., 12., 9., 4. },
-	{ 2., 4., 5., 4., 2. } };
+	int** gaussianFilter = new int*[width];
+	for (int i = -(width / 2); i < (width / 2) + 1; i++) {
+		gaussianFilter[i + (width / 2)] = new int[width];
+		for (int j = -(width / 2); j < (width / 2) + 1; j++) {
+			gaussianFilter[i + (width / 2)][j + (width / 2)] = int(exp(-(float(i*i) + float(j*j)) / (2.0f * sigma)));
+		}
+	}
 
 	int gaussian_normfactor = 0;
-	//Transfer values and normalize
+	// normalize
 	for (int i = 0; i < mask_rows; i++) {
-		gaussianFilter[i] = new int[mask_cols];
 		for (int j = 0; j < mask_cols; j++) {
-			gaussianFilter[i][j] = int(temp[i][j]);
 			gaussian_normfactor = gaussian_normfactor + gaussianFilter[i][j];
 		}
 	}
-	
 
 	//Edge detection:
 	//Dimentions of filter mask
@@ -508,7 +520,7 @@ int main() {
 		int **image;
 
 		int which_image = 0;
-		cout << "Please input a number between 0 and 4 to chose image, or 5 for exit" << endl;
+		cout << "Please input a number between 0 and 5 to chose image, (0 => leaf ; 1 => cana ; 2 => fruit ; 3 => img335 ; 4 => lamp), or 5 for exit" << endl;
 		cin >> which_image;
 
 		switch (which_image) {
@@ -550,46 +562,6 @@ int main() {
 	}	
 	
 	
-	//unconditional loop
-	/*
-	while (true) {
-		
-		Mat raw;
-
-		//Grab image from camera
-		stream1.read(raw);
-
-		Mat gray;
-		//Change to gray scale
-		cvtColor(raw, gray, CV_RGB2GRAY);
-
-		//Display image
-		imshow("gray", gray);
-
-
-		//2d-array of pixels
-		int **image;
-		image = new int *[gray.rows];
-
-		//Fill with actual pixel-values for image
-		for (int i = 0; i < gray.rows; ++i) {
-			image[i] = new int[gray.cols];
-			for (int j = 0; j < gray.cols; ++j) {
-				image[i][j] = int(gray.at<uint8_t>(i, j));
-
-			}
-
-		}
-
-		edge_detection(image, gray.rows, gray.cols, gaussianFilter, mask_rows, mask_cols, sobelMask_x, sobelMask_y, sobelmask_rows, sobelmask_cols, gaussian_normfactor, false);
-
-
-		if (waitKey(30) >= 0)
-			break;
-
-
-	}
-	*/
 
 	delete gaussianFilter;
 	delete sobelMask_x, sobelMask_y;
