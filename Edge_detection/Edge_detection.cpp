@@ -25,7 +25,7 @@ const char* name_of_image;
 
 
 
-float PI = 3.14;
+float PI = 3.14159265;
 
 int** gaussianMask(int std) {	
 	int** result = new int*[3];
@@ -460,21 +460,40 @@ int main() {
 	const int mask_rows = width;
 	const int mask_cols = width;
 
-	int** gaussianFilter = new int*[width];
+	float smallest_gaussian = 10000.0;
+	float** gaussianFilter_float = new float*[width];
+	
 	for (int i = -(width / 2); i < (width / 2) + 1; i++) {
-		gaussianFilter[i + (width / 2)] = new int[width];
+		
+		gaussianFilter_float[i + (width / 2)] = new float[width];
 		for (int j = -(width / 2); j < (width / 2) + 1; j++) {
-			gaussianFilter[i + (width / 2)][j + (width / 2)] = int(exp(-(float(i*i) + float(j*j)) / (2.0f * sigma)));
+			gaussianFilter_float[i + (width / 2)][j + (width / 2)] = (1.0/(2.0*PI*sigma* sigma))*exp(-(float(i*i) + float(j*j)) / (2.0f * sigma* sigma));
+			if (gaussianFilter_float[i + (width / 2)][j + (width / 2)] < smallest_gaussian && gaussianFilter_float[i + (width / 2)][j + (width / 2)] > 0.001) {
+				smallest_gaussian = gaussianFilter_float[i + (width / 2)][j + (width / 2)];
+			}
+			
 		}
+		
 	}
+	
+	cout << "Smallest Gaussian :  " << smallest_gaussian << width << endl;
 
+	
 	int gaussian_normfactor = 0;
-	// normalize
+	int** gaussianFilter = new int*[mask_rows];
+	cout << "[";
 	for (int i = 0; i < mask_rows; i++) {
+		cout << "[";
+		gaussianFilter[i] = new int[mask_cols];
 		for (int j = 0; j < mask_cols; j++) {
+			gaussianFilter[i][j] = int(round(gaussianFilter_float[i][j] / smallest_gaussian));
 			gaussian_normfactor = gaussian_normfactor + gaussianFilter[i][j];
+			cout << gaussianFilter[i][j] << "  ";
 		}
+		cout << "]" << endl;
 	}
+	cout << "]" << endl;
+
 
 	//Edge detection:
 	//Dimentions of filter mask
@@ -551,12 +570,14 @@ int main() {
 			cout << "Invalid input, please enter 0 - 4, or 5 for break" << endl;
 
 		}
+		cout << "Press Q to go back to main menu" << endl;
 
 		if(run==true){
-			
 			edge_detection(image, rows, cols, gaussianFilter, mask_rows, mask_cols, sobelMask_x, sobelMask_y, sobelmask_rows, sobelmask_cols, gaussian_normfactor, true);
-			if (waitKey(30) >= 0)
-				break;
+			while(true){
+				if (waitKey(30) >= 0)
+					break;
+			}
 		
 		}
 	}	
