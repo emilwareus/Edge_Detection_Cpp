@@ -541,7 +541,6 @@ int main() {
 			cout << "Invalid input, please enter 0 - 4, or 5 for break" << endl;
 
 		}
-		cout << "Press Q to go back to main menu" << endl;
 
 		if(run==true){
 			//EDGE DETECTION
