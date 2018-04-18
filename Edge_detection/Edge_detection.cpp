@@ -545,11 +545,7 @@ int main() {
 		if(run==true){
 			//EDGE DETECTION
 			edge_detection(image, rows, cols, gaussianFilter, mask_rows, mask_cols, sobelMask_x, sobelMask_y, sobelmask_rows, sobelmask_cols, gaussian_normfactor, true);
-			while(true){
-				if (waitKey(30) >= 0)
-					break;
-			}
-		
+			waitKey(30);
 		}
 	}	
 
