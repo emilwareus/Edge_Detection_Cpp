@@ -149,27 +149,28 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 			// Computation of the magnitude of the gradient
 			sobel_image[i][j] = int(sqrt(xmask_image[i][j] * xmask_image[i][j] + ymask_image[i][j] * ymask_image[i][j]));
 
-
+			/*
 			if (sobel_image[i][j]>255) {
 				sobel_image[i][j] = 255;
 			}
 			else if (sobel_image[i][j]<0) {
 				sobel_image[i][j] = 0;
 			}
+			*/
 
 			// Comutation of the direction of the gradient
 			float temp_dir = atan2(ymask_image[i][j], xmask_image[i][j]) / PI * 180;
 			// The values of the gradient direction are rounded to 4 values : 0 ; 45 ; 90 ; 135
-			if ((temp_dir>-22.5 && temp_dir <= 22.5) || (temp_dir>-157.5 && temp_dir <= 157.5)) {
+			if ((temp_dir>-22.5 && temp_dir <= 22.5) || (temp_dir<-157.5 || temp_dir >= 157.5)) {
 				temp_dir = 0;
 			}
-			else if ((temp_dir>22.5 && temp_dir <= 67.5) || (temp_dir>112.5 && temp_dir <= -157.5)) {
+			else if ((temp_dir>22.5 && temp_dir <= 67.5) || (temp_dir < -112.5 && temp_dir >= -157.5)) {
 				temp_dir = 45;
 			}
-			else if ((temp_dir>67.5 && temp_dir <= 112.5) || (temp_dir <= -67.5 && temp_dir >= -112.5)) {
+			else if ((temp_dir>67.5 && temp_dir <= 112.5) || (temp_dir < -67.5 && temp_dir >= -112.5)) {
 				temp_dir = 90;
 			}
-			else if ((temp_dir>112.5 && temp_dir <= 157.5) || (temp_dir>-22.5 && temp_dir <= -67.5)) {
+			else if ((temp_dir>112.5 && temp_dir <= 157.5) || (temp_dir < -22.5 && temp_dir >= -67.5)) {
 				temp_dir = 135;
 			}
 			edges_image[i][j] = temp_dir;
@@ -192,12 +193,12 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 		for (int j = 1; j<out_cols - 1; j++) {
 			// Since the direction of the gradient is perpendicular to the edge, we check the 2 pixels in the gradient's direction
 			// If the current pixel is inferior to on of these 2 pixels then it is set to 0
-			if (edges_image[i][j] == 0) { // gradient direction => vertical 
+			if (edges_image[i][j] == 90) { // gradient direction => vertical 
 				if ((sobel_image[i][j] < sobel_image[i][j + 1]) || (sobel_image[i][j] < sobel_image[i][j - 1])) {
 					thinned_edges_image[i][j] = 0;
 				}
 			}
-			else if (edges_image[i][j] == 90) { // gradient direction => horizontal 
+			else if (edges_image[i][j] == 0) { // gradient direction => horizontal 
 				if ((sobel_image[i][j] < sobel_image[i + 1][j]) || (sobel_image[i][j] < sobel_image[i - 1][j])) {
 					thinned_edges_image[i][j] = 0;
 				}
@@ -294,9 +295,7 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 		}
 	}
 
-	//Display matrix
-	imshow("Blur_image", blur_mat);
-
+	
 	//___________________
 
 	//output CV_matrix for display
@@ -311,8 +310,6 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 		}
 	}
 
-	//Display matrix
-	imshow("Sobel_image", out_mat);
 
 	//___________________
 
@@ -327,8 +324,7 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 		}
 	}
 
-	//Display matrix
-	imshow("Thinned_edges_image", thinned_edges_mat);
+
 
 
 	//________________
@@ -344,8 +340,6 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 
 		}
 	}
-	//Display matrix
-	imshow("Threshold_image", threshold_mat);
 
 
 	//________________
@@ -360,8 +354,7 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 
 		}
 	}
-	//Display matrix
-	imshow("Hysteresis_image", hysteresis_mat);
+
 
 
 	//________________	
@@ -404,6 +397,22 @@ void edge_detection(int **image, int image_rows, int image_cols, int **gaussianF
 	delete blur_image;
 	delete image;
 	
+	while(true){
+		//Display matrix
+		imshow("Blur_image", blur_mat);
+		//Display matrix
+		imshow("Sobel_image", out_mat);
+		//Display matrix
+		imshow("Thinned_edges_image", thinned_edges_mat);
+		//Display matrix
+		imshow("Threshold_image", threshold_mat);
+		//Display matrix
+		imshow("Hysteresis_image", hysteresis_mat);
+		
+		if (waitKey(30) == 'q') {
+			break;
+		}
+	}
 
 }
 
@@ -545,7 +554,7 @@ int main() {
 		if(run==true){
 			//EDGE DETECTION
 			edge_detection(image, rows, cols, gaussianFilter, mask_rows, mask_cols, sobelMask_x, sobelMask_y, sobelmask_rows, sobelmask_cols, gaussian_normfactor, true);
-			waitKey(30);
+			
 		}
 	}	
 
